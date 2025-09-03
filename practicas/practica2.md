@@ -2,29 +2,158 @@
 
 ## 1. ¿Cuál es la función de la capa de aplicación?
 
+La capa de aplicación es donde **residen las aplicaciones de red y sus protocolos de nivel de aplicación**. Su función principal es **proporcionar servicios de comunicación directamente a los procesos de aplicación** que se ejecutan en diferentes _hosts_. Desde la perspectiva del desarrollador, el desarrollo de una aplicación de red implica **escribir programas que se ejecuten en distintos sistemas terminales y que se comuniquen entre sí a través de la red**.
+
+Esta capa define cómo los procesos de una aplicación, ejecutándose en diferentes sistemas terminales, se pasan los mensajes entre sí. Específicamente, un protocolo de la capa de aplicación define:
+
+- Los tipos de mensajes intercambiados (por ejemplo, mensajes de solicitud y respuesta).
+- La sintaxis de estos mensajes (campos y delimitación).
+- La semántica de los campos (significado de la información).
+- Las reglas para cuándo y cómo un proceso envía y responde a los mensajes.
+
+Las aplicaciones de red, como la Web, el correo electrónico o DNS, utilizan los servicios de esta capa para interactuar.
+
 ## 2. Si dos procesos deben comunicarse:
 
 ### a. ¿Cómo podrían hacerlo si están en diferentes máquinas?
 
+Los procesos de dos sistemas terminales diferentes se comunican entre sí **intercambiando mensajes a través de la red de computadoras**. Un proceso emisor crea y envía mensajes a la red, y un proceso receptor recibe estos mensajes y posiblemente responde. Esta comunicación se realiza a través de una **interfaz _software_ denominada _socket_**. El proceso emisor envía el mensaje a través de su propio _socket_, esperando que una infraestructura de transporte al otro lado del _socket_ lleve el mensaje hasta el _socket_ del proceso de destino. Para identificar al proceso receptor, se especifican **la dirección IP del _host_ de destino y un número de puerto de destino** que identifica el _socket_ específico en ese _host_.
+
 ### b. Y si están en la misma máquina, ¿qué alternativas existen?
+
+Cuando los procesos se ejecutan en el mismo sistema terminal, pueden comunicarse entre sí mediante **sistemas de comunicación inter-procesos, aplicando reglas gobernadas por el sistema operativo del sistema terminal**.
 
 ## 3. Explique brevemente cómo es el modelo Cliente/Servidor. Dé un ejemplo de un sistema Cliente/Servidor en la “vida cotidiana” y un ejemplo de un sistema informático que siga el modelo Cliente/Servidor. ¿Conoce algún otro modelo de comunicación?
 
+En una **arquitectura cliente-servidor**, existe un _host_ siempre activo, denominado **servidor**, que da servicio a las solicitudes de muchos otros _hosts_, que son los **clientes**. Los clientes no se comunican directamente entre sí, sino solo con el servidor. Una característica clave es que el servidor tiene una **dirección fija y conocida (dirección IP)** y está siempre activo, lo que permite a los clientes contactarlo enviándole paquetes a su dirección IP.
+
+- **Ejemplo en la “vida cotidiana”**: Una analogía adecuada podría ser una **biblioteca**. Los usuarios (clientes) van a la biblioteca (servidor) para solicitar y obtener libros (información o servicios). La biblioteca está siempre disponible, tiene una dirección fija y contiene los recursos. Los usuarios no interactúan directamente entre sí para obtener libros, sino a través de la biblioteca.
+
+- **Ejemplo de sistema informático**: La **Web** es un ejemplo clásico, donde un servidor web siempre activo sirve las solicitudes de los navegadores que se ejecutan en los _hosts_ clientes. Otros ejemplos incluyen **FTP, Telnet y el correo electrónico**, así como motores de búsqueda, sitios de comercio electrónico y redes sociales, que a menudo utilizan grandes **centros de datos** para actuar como servidores virtuales de gran capacidad.
+
+- **Otro modelo de comunicación**: El modelo **P2P (Peer-to-Peer)** es otro paradigma arquitectónico predominante. En este modelo, los _hosts_ conectados de forma intermitente, denominados _pares_ o _peers_, se comunican directamente entre sí, dependiendo mínimamente o en absoluto de una infraestructura de servidores siempre activos. Un ejemplo de aplicación P2P es la **compartición de archivos (como BitTorrent)**. Algunas aplicaciones pueden tener **arquitecturas híbridas** que combinan elementos cliente-servidor y P2P.
+
 ## 4. Describa la funcionalidad de la entidad genérica “Agente de usuario” o “User agent”.
+
+El término "**Agente de usuario**" o "**User-agent**" se utiliza en dos contextos principales:
+
+1.  **En HTTP (Web)**: La línea de cabecera `User-agent:` en un mensaje de solicitud HTTP **especifica el tipo de navegador que está haciendo la solicitud al servidor**. Esto es útil porque el servidor puede enviar versiones diferentes del mismo objeto a distintos tipos de agentes de usuario (navegadores), aunque todas las versiones tengan la misma URL. Por ejemplo, `User-agent: Mozilla/5.0` identifica un navegador Firefox.
+
+2.  **En Correo Electrónico**: Los "**agentes de usuario**" permiten a los usuarios **leer, responder, reenviar, guardar y componer mensajes**. Ejemplos incluyen Microsoft Outlook y Apple Mail. Cuando un usuario termina de componer un mensaje, su agente de usuario lo envía a su servidor de correo, y cuando un destinatario quiere leer un mensaje, su agente de usuario lo recupera de su buzón en el servidor de correo.
+
+En resumen, un agente de usuario es el **programa _cliente_ que interactúa directamente con el usuario final**, permitiéndole acceder y manipular los servicios de red.
 
 ## 5. ¿Qué son y en qué se diferencian HTML y HTTP?
 
+- **HTML (HyperText Markup Language)**: Es un **estándar para los formatos de documentos**. Se utiliza para **crear objetos o documentos web**, que consisten en archivos como texto, imágenes JPEG, applets Java o clips de vídeo, direccionables mediante una URL. Las páginas web suelen estar compuestas por un archivo base HTML y varios objetos referenciados por URLs dentro de ese archivo.
+- **HTTP (HyperText Transfer Protocol)**: Es el **protocolo de la capa de aplicación de la Web**. Define **cómo los clientes web solicitan páginas web a los servidores y cómo estos servidores web transfieren esas páginas a los clientes**. También especifica la **estructura y la secuencia de los mensajes** que se pasan entre el navegador web y el servidor web. HTTP utiliza TCP como su protocolo de transporte subyacente.
+
+**Diferencias:**
+
+- **Naturaleza**: HTML es un **formato de lenguaje de marcado** utilizado para estructurar y presentar contenido en la Web. HTTP es un **protocolo de comunicación** que define las reglas para la transferencia de esos documentos y objetos web entre clientes y servidores.
+- **Función**: HTML se encarga de **lo que se muestra** y cómo se organiza el contenido en una página. HTTP se encarga de **cómo se obtiene y se envía ese contenido** a través de la red.
+- **Relación**: HTML es un _componente_ de la aplicación Web, mientras que HTTP es el _protocolo de la capa de aplicación_ que permite la existencia de la Web, transfiriendo los documentos HTML y otros objetos.
+
 ## 6. HTTP tiene definido un formato de mensaje para los requerimientos y las respuestas. (Ayuda: apartado “Formato de mensaje HTTP”, Kurose).
 
-### a. ¿Qué información de la capa de aplicación nos indica si un mensaje es de requerimiento o de respuesta para HTTP? ¿Cómo está compuesta dicha información?¿Para qué sirven las cabeceras?
+### a. ¿Qué información de la capa de aplicación nos indica si un mensaje es de requerimiento o de respuesta para HTTP? ¿Cómo está compuesta dicha información? ¿Para qué sirven las cabeceras?
+
+- **Identificación de requerimiento o respuesta**: La **primera línea** del mensaje HTTP es la que indica si es un requerimiento o una respuesta.
+  - Para un **mensaje de solicitud (requerimiento)**, esta es la **línea de solicitud**, que consta de tres campos: el **método** (por ejemplo, GET, POST, HEAD, PUT, DELETE), la **URL** del objeto solicitado y la **versión HTTP**.
+  - Para un **mensaje de respuesta**, esta es la **línea de estado**, que contiene la **versión del protocolo, un código de estado y un mensaje explicativo del estado** (por ejemplo, "200 OK", "404 Not Found").
+
+- **Función de las cabeceras**: Las líneas de cabecera que siguen a la línea de solicitud o de estado proporcionan **información adicional** sobre el mensaje o el objeto. Sirven para:
+  - **Identificación del _host_**: Como `Host:` en solicitudes, que especifica el _host_ donde reside el objeto.
+  - **Control de conexión**: Como `Connection: close` o `Connection: keep-alive`.
+  - **Información del _cliente_**: Como `User-agent:` para el tipo de navegador, o `Accept-language:` para idiomas preferidos.
+  - **Información del _servidor_**: Como `Server:` (tipo de servidor web), `Date:` (fecha de creación de la respuesta), `Last-Modified:` (última modificación del objeto).
+  - **Descripción del contenido**: Como `Content-Length:` (tamaño del objeto) y `Content-Type:` (tipo de medio del objeto).
+  - **Mecanismos de autenticación y caché**: Las cabeceras son fundamentales para funciones como las _cookies_ y las solicitudes **GET condicionales** con `If-Modified-Since:` para la gestión de cachés.
 
 ### b. ¿Cuál es su formato? (Ayuda: https://developer.mozilla.org/es/docs/Web/HTTP/Headers)
 
+El formato general de los mensajes HTTP es el siguiente:
+
+- **Mensaje de solicitud HTTP**:
+
+  ```
+  <Línea de solicitud>
+  <Líneas de cabecera>
+  <Línea en blanco>
+  <Cuerpo de entidad (opcional)>
+  ```
+
+  La **línea de solicitud** incluye el método, el URL y la versión HTTP (ej: `GET /index.html HTTP/1.1`). El **cuerpo de entidad** suele estar vacío para el método `GET`, pero contiene datos de formulario para el método `POST`.
+
+- **Mensaje de respuesta HTTP**:
+  ```
+  <Línea de estado>
+  <Líneas de cabecera>
+  <Línea en blanco>
+  <Cuerpo de entidad (con el objeto solicitado)>
+  ```
+  La **línea de estado** incluye la versión HTTP, un código de estado y una frase explicativa (ej: `HTTP/1.1 200 OK`). El **cuerpo de entidad** contiene el objeto solicitado, como un archivo HTML o una imagen.
+
 ### c. Suponga que desea enviar un requerimiento con la versión de HTTP 1.1 desde curl/7.74.0 a un sitio de ejemplo como www.misitio.com para obtener el recurso /index.html. En base a lo indicado, ¿qué información debería enviarse mediante encabezados? Indique cómo quedaría el requerimiento.
 
-## 7. Utilizando la VM, abra una terminal e investigue sobre el comando curl. Analice para qué sirven los siguientes parámetros (-I, -H, -X, -s). 8. Ejecute el comando curl sin ningún parámetro adicional y acceda a www.redes.unlp.edu.ar. Luego responda:
+Según el formato de mensaje de solicitud HTTP y considerando la información provista, el requerimiento debería incluir:
+
+- **Línea de Solicitud**: Método `GET`, URL `/index.html`, versión `HTTP/1.1`.
+- **Cabeceras**:
+  - `Host:` para especificar el _host_ `www.misitio.com`.
+  - `User-Agent:` para identificar el cliente como `curl/7.74.0`.
+  - `Connection: close` para indicar que el cliente desea que el servidor cierre la conexión después de enviar el objeto, aunque HTTP/1.1 utilice conexiones persistentes por defecto, el cliente puede especificar lo contrario.
+
+El requerimiento quedaría así:
+
+```bash
+GET /index.html HTTP/1.1
+Host: www.misitio.com
+User-Agent: curl/7.74.0
+Connection: close
+(línea en blanco adicional para indicar el final de las cabeceras)
+```
+
+## 7. Utilizando la VM, abra una terminal e investigue sobre el comando curl. Analice para qué sirven los siguientes parámetros (-I, -H, -X, -s).
+
+Curl es una herramienta de línea de comandos utilizada para transferir datos desde o hacia un servidor, utilizando varios protocolos, incluido HTTP. A continuación se describen los parámetros mencionados:
+
+- `-I` o `--head`: Este parámetro se utiliza para realizar una solicitud HTTP HEAD. En lugar de descargar el contenido del recurso, solo recupera las cabeceras de la respuesta. Es útil para obtener información sobre el recurso, como su tipo, tamaño y fecha de última modificación, sin descargar el cuerpo del mensaje.
+
+```bash
+curl -I www.redes.unlp.edu.ar
+HTTP/1.1 200 OK
+Date: Wed, 03 Sep 2025 17:18:01 GMT
+Server: Apache/2.4.56 (Unix)
+Last-Modified: Sun, 19 Mar 2023 19:04:46 GMT
+ETag: "1322-5f7457bd64f80"
+Accept-Ranges: bytes
+Content-Length: 4898
+Content-Type: text/html
+
+```
+
+- `-H` o `--header <header>`: Este parámetro permite agregar cabeceras personalizadas a la solicitud HTTP. Puedes especificar cualquier cabecera que desees enviar al servidor, como `User-Agent`, `Accept`, `Authorization`, entre otras. Por ejemplo, `-H "User-Agent: MyCustomAgent"` agrega una cabecera personalizada a la solicitud.
+
+```bash
+curl -H "User-Agent: MyCustomAgent" www.redes.unlp.edu.ar
+<!DOCTYPE html>
+<html>...</heml>
+```
+
+- `-X` o `--request <command>`: Este parámetro se utiliza para especificar el método HTTP que deseas utilizar en la solicitud. Por defecto, curl utiliza el método GET, pero con `-X` puedes cambiarlo a otros métodos como POST, PUT, DELETE, etc. Por ejemplo, `-X POST` indica que la solicitud debe ser un POST en lugar de un GET.
+
+```bash
+curl -X POST -d "param1=value1&param2=value2" www.redes.unlp.edu.ar
+<!DOCTYPE html>
+<html>...</html>
+```
+
+## 8. Ejecute el comando curl sin ningún parámetro adicional y acceda a www.redes.unlp.edu.ar. Luego responda:
 
 ### a. ¿Cuántos requerimientos realizó y qué recibió? Pruebe redirigiendo la salida (>) del comando curl a un archivo con extensión html y abrirlo con un navegador.
+
+Realizó un único requerimiento HTTP GET y recibió el código fuente (el archivo HTML) de la página. A diferencia de un navegador web, que realiza múltiples peticiones para obtener imágenes, hojas de estilo (CSS) y scripts (JavaScript), curl solo descarga el archivo principal que le indicaste.
 
 ### b. ¿Cómo funcionan los atributos href de los tags link e img en html?
 
