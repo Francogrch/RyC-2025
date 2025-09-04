@@ -81,6 +81,13 @@ El formato general de los mensajes HTTP es el siguiente:
   <Líneas de cabecera>
   <Línea en blanco>
   <Cuerpo de entidad (opcional)>
+
+  GET /index.html HTTP/1.1
+  Host: www.misitio.com
+  User-Agent: curl/7.74.0
+  Connection: close
+
+  (cuerpo de entidad, vacio para el metodo GET)
   ```
 
   La **línea de solicitud** incluye el método, el URL y la versión HTTP (ej: `GET /index.html HTTP/1.1`). El **cuerpo de entidad** suele estar vacío para el método `GET`, pero contiene datos de formulario para el método `POST`.
@@ -91,6 +98,17 @@ El formato general de los mensajes HTTP es el siguiente:
   <Líneas de cabecera>
   <Línea en blanco>
   <Cuerpo de entidad (con el objeto solicitado)>
+
+  HTTP/1.1 200 OK
+  Date: Wed, 03 Sep 2025 17:18:01 GMT
+  Server: Apache/2.4.56 (Unix)
+  Last-Modified: Sun, 19 Mar 2023 19:04:46 GMT
+  ETag: "1322-5f7457bd64f80"
+  Accept-Ranges: bytes
+  Content-Length: 4898
+  Content-Type: text/html
+
+  <html>...</html>
   ```
   La **línea de estado** incluye la versión HTTP, un código de estado y una frase explicativa (ej: `HTTP/1.1 200 OK`). El **cuerpo de entidad** contiene el objeto solicitado, como un archivo HTML o una imagen.
 
@@ -153,13 +171,38 @@ curl -X POST -d "param1=value1&param2=value2" www.redes.unlp.edu.ar
 
 ### a. ¿Cuántos requerimientos realizó y qué recibió? Pruebe redirigiendo la salida (>) del comando curl a un archivo con extensión html y abrirlo con un navegador.
 
-Realizó un único requerimiento HTTP GET y recibió el código fuente (el archivo HTML) de la página. A diferencia de un navegador web, que realiza múltiples peticiones para obtener imágenes, hojas de estilo (CSS) y scripts (JavaScript), curl solo descarga el archivo principal que le indicaste.
+**Tal como indicas**, el comando `curl` sin parámetros adicionales realiza **un único requerimiento HTTP GET** al servidor `www.redes.unlp.edu.ar` y **recibe como respuesta el código fuente del archivo HTML principal** de la página solicitada.
+
+Cuando rediriges la salida de `curl` a un archivo `.html` y lo abres con un navegador, el navegador solo muestra el texto y la estructura del HTML, pero no descarga ni muestra las imágenes, hojas de estilo (CSS) o scripts (JavaScript) referenciados. Esto se debe a que `curl` actúa como un **cliente HTTP básico** que solo busca el objeto especificado en la URL, mientras que un navegador web es un cliente HTTP completo que, al analizar el archivo HTML recibido, identifica y solicita de forma independiente todos los objetos referenciados.
 
 ### b. ¿Cómo funcionan los atributos href de los tags link e img en html?
 
+En HTML, los atributos `href` (en el caso de las etiquetas `<link>`, por ejemplo, para hojas de estilo) y `src` (en el caso de las etiquetas `<img>` para imágenes) funcionan como **referencias a las URL de otros objetos** que forman parte de la página web.
+
+Cuando un navegador web recibe un archivo HTML base, lo **analiza para encontrar estas referencias** a otros objetos (como imágenes JPEG, applets Java, hojas de estilo o clips de vídeo). Cada una de estas URL indica la ubicación del objeto, compuesta por el nombre de host del servidor que lo aloja y la ruta al objeto dentro de ese servidor.
+
+El navegador utiliza esta información para **enviar mensajes de solicitud HTTP adicionales al servidor** para cada uno de los objetos referenciados, a fin de poder presentarlos en la página. Este proceso demuestra que una página web no es un único archivo, sino una colección de objetos distintos.
+
 ### c. Para visualizar la página completa con imágenes como en un navegador, ¿alcanza con realizar un único requerimiento?
 
+**No, no es suficiente con realizar un único requerimiento HTTP GET** para visualizar una página web completa con sus imágenes, hojas de estilo y scripts, tal como lo haría un navegador.
+
 ### d. ¿Cuántos requerimientos serían necesarios para obtener una página que tiene dos CSS, dos Javascript y tres imágenes? Diferencie cómo funcionaría un navegador respecto al comando curl ejecutado previamente.
+
+Para una página web que contiene dos archivos CSS, dos archivos JavaScript y tres imágenes, el número de requerimientos HTTP sería el siguiente:
+
+*   **Para el comando `curl` (ejecutado previamente):**
+    *   Se realizaría **1 requerimiento HTTP GET**.
+    *   `curl` solo descarga el archivo HTML principal de la URL especificada, **sin procesar las referencias a otros objetos** incrustados. Por lo tanto, no realizaría peticiones adicionales para los archivos CSS, JavaScript o las imágenes.
+
+*   **Para un navegador web:**
+    *   Se realizarían un total de **8 requerimientos HTTP GET**:
+        *   1 requerimiento para el archivo HTML principal.
+        *   2 requerimientos para los dos archivos CSS referenciados.
+        *   2 requerimientos para los dos archivos JavaScript referenciados.
+        *   3 requerimientos para las tres imágenes referenciadas.
+
+La diferencia clave radica en que el **navegador web actúa como un cliente HTTP completo** que **analiza el archivo HTML recibido** y, al encontrar las URL de los objetos referenciados, **inicia de forma autónoma nuevas solicitudes HTTP** para obtener cada uno de ellos. Por el contrario, el comando `curl` se comporta como un **cliente HTTP simplificado** que solo recupera el recurso directamente indicado por la URL en la línea de comandos y no realiza un análisis posterior del contenido para descargar recursos vinculados.
 
 ## 9. Ejecute a continuación los siguientes comandos:
 
@@ -167,6 +210,8 @@ Realizó un único requerimiento HTTP GET y recibió el código fuente (el archi
     curl -I -v -s www.redes.unlp.edu.ar
 
 ### a. ¿Qué diferencias nota entre cada uno?
+El primer comando `curl -v -s www.redes.unlp.edu.ar > /dev/null` realiza una solicitud HTTP GET al servidor `www.redes.unlp.edu.ar` y redirige la salida estándar a `/dev/null`, lo que significa que no verás el contenido del cuerpo de la respuesta. Sin embargo, debido a la opción `-v` (verbose), verás en la salida estándar los detalles de la conexión, incluyendo las cabeceras de solicitud y respuesta, así como información sobre la conexión TCP.
+El segundo comando `curl -I -v -s www.redes.unlp.edu.ar` realiza una solicitud HTTP HEAD al mismo servidor. La opción `-I` indica que solo se deben recuperar las cabeceras de la respuesta, sin el cuerpo del mensaje. Al igual que en el primer comando, la opción `-v` proporciona detalles de la conexión y las cabeceras.
 
 ### b. ¿Qué ocurre si en el primer comando se quita la redirección a /dev/null? ¿Por qué no es necesaria en el segundo comando?
 
