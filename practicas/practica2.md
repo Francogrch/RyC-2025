@@ -211,31 +211,105 @@ La diferencia clave radica en que el **navegador web actúa como un cliente HTTP
 
 ### a. ¿Qué diferencias nota entre cada uno?
 El primer comando `curl -v -s www.redes.unlp.edu.ar > /dev/null` realiza una solicitud HTTP GET al servidor `www.redes.unlp.edu.ar` y redirige la salida estándar a `/dev/null`, lo que significa que no verás el contenido del cuerpo de la respuesta. Sin embargo, debido a la opción `-v` (verbose), verás en la salida estándar los detalles de la conexión, incluyendo las cabeceras de solicitud y respuesta, así como información sobre la conexión TCP.
-El segundo comando `curl -I -v -s www.redes.unlp.edu.ar` realiza una solicitud HTTP HEAD al mismo servidor. La opción `-I` indica que solo se deben recuperar las cabeceras de la respuesta, sin el cuerpo del mensaje. Al igual que en el primer comando, la opción `-v` proporciona detalles de la conexión y las cabeceras.
+El segundo comando `curl -I -v -s www.redes.unlp.edu.ar` realiza una solicitud HTTP HEAD al mismo servidor. La opción `-I` indica que solo se envian las cabeceras de la respuesta, sin el cuerpo del mensaje. Al igual que en el primer comando, la opción `-v` proporciona detalles de la conexión y las cabeceras.
 
 ### b. ¿Qué ocurre si en el primer comando se quita la redirección a /dev/null? ¿Por qué no es necesaria en el segundo comando?
 
+Si le quitas la redireccion vas a obtener el contenido completo, incluyendo el body del mensaje. En el segundo comando no es necesario ya que al utilizar el metodo HEAD no se obtiene el body del mensaje.
+
 ### c. ¿Cuántas cabeceras viajaron en el requerimiento? ¿Y en la respuesta?
+
+En el primer comando, el numero de cabeceras son 3 en el requerimiento y 8 en la respuesta, mientras que en el segundo comando fueron 3 en el requerimiento y 8 en la respuesta.
 
 ## 10. ¿Qué indica la cabecera Date?
 
+La cabecera `Date` en una respuesta HTTP indica la **fecha y hora en que el mensaje fue generado por el servidor**. Esta información es útil para que el cliente pueda conocer cuándo se creó la respuesta, lo que puede ser relevante para la gestión de cachés y para sincronizar la información entre el cliente y el servidor. La fecha y hora están en formato GMT (Greenwich Mean Time) y siguen el estándar definido por RFC 7231.
+
 ## 11. En HTTP/1.0, ¿cómo sabe el cliente que ya recibió todo el objeto solicitado de manera completa? ¿Y en HTTP/1.1?
+
+Para determinar cuándo un cliente ha recibido completamente el objeto solicitado en HTTP, existen diferencias clave entre HTTP/1.0 y HTTP/1.1, principalmente relacionadas con el manejo de las conexiones TCP y las cabeceras de los mensajes.
+
+*   **En HTTP/1.0 (conexiones no persistentes):**
+    En HTTP/1.0, las conexiones suelen ser **no persistentes**. Esto significa que se establece una conexión TCP separada para cada solicitud y respuesta de un objeto.
+    El cliente sabe que ha recibido el objeto completo porque el **servidor cierra la conexión TCP** una vez que ha terminado de enviar el objeto solicitado. La conexión no se mantiene (no persiste) para otros objetos. Cada conexión TCP transporta exactamente un mensaje de solicitud y un mensaje de respuesta.
+
+*   **En HTTP/1.1 (conexiones persistentes):**
+    HTTP/1.1 utiliza **conexiones persistentes por defecto**. Con las conexiones persistentes, el servidor deja la conexión TCP abierta después de enviar una respuesta, permitiendo que subsiguientes solicitudes y respuestas entre el mismo cliente y servidor se envíen a través de la misma conexión. Esto implica que el cierre de la conexión TCP ya no puede ser el mecanismo para señalar el fin de un objeto individual.
+    En su lugar, el cliente de HTTP/1.1 determina que ha recibido el objeto completo mediante la **cabecera `Content-Length`** incluida en el mensaje de respuesta HTTP. Esta cabecera especifica el número de bytes del objeto que está siendo enviado. El cliente lee exactamente esa cantidad de bytes y, al hacerlo, sabe que ha recibido el objeto en su totalidad.
+    Es importante notar que, aunque HTTP/1.1 usa conexiones persistentes por defecto, un cliente puede solicitar explícitamente una conexión no persistente incluyendo la cabecera `Connection: close` en su mensaje de solicitud. En ese caso, el comportamiento sería similar al de HTTP/1.0, donde el cierre de la conexión TCP indicaría el final del objeto.
 
 ## 12. Investigue los distintos tipos de códigos de retorno de un servidor web y su significado. Considere que los mismos se clasifican en categorías (2XX, 3XX, 4XX, 5XX).
 
-## 13. Utilizando curl, realice un requerimiento con el método HEAD al sitio www.redes.unlp.edu.ar e indique:
+Los códigos de estado se clasifican en categorías según su primer dígito:
 
+*   **Códigos 2XX: Respuestas satisfactorias**
+    *   Estos códigos indican que la acción solicitada por el cliente ha sido **recibida, comprendida y aceptada con éxito**.
+    *   **Ejemplo:** `200 OK`
+        *   Este código, como se ve en un mensaje de respuesta HTTP típico, significa que "todo es correcto; es decir, que el servidor ha encontrado y está enviando el objeto solicitado".
+
+*   **Códigos 3XX: Redirecciones**
+    *   Estos códigos informan al cliente que la solicitud requiere de una **acción adicional** para completarse, generalmente una redirección a otra ubicación.
+    *   **Ejemplo:** `301 Moved Permanently`
+        *   Significa que "el objeto solicitado ha sido movido de forma permanente; el nuevo URL se especifica en la línea de cabecera `Location:` del mensaje de respuesta. El software cliente recuperará automáticamente el nuevo URL".
+
+*   **Códigos 4XX: Errores del cliente**
+    *   Estos códigos indican que ha habido un error por parte del **cliente** al realizar la solicitud.
+    *   **Ejemplo:** `400 Bad Request`
+        *   Es "un código de error genérico que indica que la solicitud no ha sido comprendida por el servidor".
+    *   **Ejemplo:** `404 Not Found`
+        *   Indica que "el documento solicitado no existe en este servidor".
+
+*   **Códigos 5XX: Errores del servidor**
+    *   Estos códigos señalan que el **servidor falló** al cumplir una solicitud aparentemente válida.
+    *   **Ejemplo:** `505 HTTP Version Not Supported`
+        *   Indica que "la versión de protocolo HTTP solicitada no es soportada por el servidor".
+
+[Mas codigos de respuestas](https://developer.mozilla.org/es/docs/Web/HTTP/Reference/Status)
+
+## 13. Utilizando curl, realice un requerimiento con el método HEAD al sitio www.redes.unlp.edu.ar e indique:
+```bash
+curl -I www.redes.unlp.edu.ar
+HTTP/1.1 200 OK
+Date: Thu, 04 Sep 2025 12:00:51 GMT
+Server: Apache/2.4.53 (Unix)
+Last-Modified: Wed, 13 Apr 2022 22:55:32 GMT
+ETag: "1322-5dc9113140100"
+Accept-Ranges: bytes
+Content-Length: 4898
+Content-Type: text/html
+```
 ### a. ¿Qué información brinda la primera línea de la respuesta?
+*HTTP/1.1 200 OK* - La respuesta fue exitosa y que la version de HTTP es 1.1
 
 ### b. ¿Cuántos encabezados muestra la respuesta?
 
+Muestra 8 encabezados.
+
 ### c. ¿Qué servidor web está sirviendo la página?
+
+Un servidor Apache/2.4.53 (Unix).
 
 ### d. ¿El acceso a la página solicitada fue exitoso o no?
 
+Sí, fue exitoso. El código de estado es 200 OK.
+
 ### e. ¿Cuándo fue la última vez que se modificó la página?
 
+La última vez que se modificó la página fue el Wed, 13 Apr 2022 22:55:32 GMT.
+
 ### f. Solicite la página nuevamente con curl usando GET, pero esta vez indique que quiere obtenerla sólo si la misma fue modificada en una fecha posterior a la que efectivamente fue modificada. ¿Cómo lo hace? ¿Qué resultado obtuvo? ¿Puede explicar para qué sirve?
+
+```bash
+curl -H "If-Modified-Since: Wed, 13 Apr 2022 23:55:32 GMT" -I www.redes.unlp.edu.ar
+HTTP/1.1 304 Not Modified
+Date: Thu, 04 Sep 2025 12:18:35 GMT
+Server: Apache/2.4.53 (Unix)
+Last-Modified: Wed, 13 Apr 2022 22:55:32 GMT
+ETag: "1322-5dc9113140100"
+Accept-Ranges: bytes
+```
+
+Para hacerlo agregue una cabecera `If-Modified-Since` con una fecha posterior a la última modificación conocida. El resultado fue un código de estado `304 Not Modified`, lo que indica que el recurso no ha sido modificado desde la fecha especificada. Esto es útil para **optimizar el uso del ancho de banda y mejorar la eficiencia**, ya que evita la transferencia innecesaria de datos si el recurso no ha cambiado.
 
 ## 14. Utilizando curl, acceda al sitio www.redes.unlp.edu.ar/restringido/index.php y siga las instrucciones y las pistas que vaya recibiendo hasta obtener la respuesta final. Será de utilidad para resolver este ejercicio poder analizar tanto el contenido de cada página como los encabezados.
 
